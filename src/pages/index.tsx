@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import StepIndicator from '../components/StepIndicator';
 import UploadZone from '../components/UploadZone';
@@ -460,6 +460,7 @@ function Step3({
   const [started, setStarted] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [done, setDone] = useState(false);
+  const finalResultsRef = useRef<StudentResult[]>([]);
 
   const startGrading = async () => {
     setStarted(true);
@@ -509,6 +510,7 @@ function Step3({
       setResults([...updatedResults]);
     }
 
+    finalResultsRef.current = updatedResults;
     setDone(true);
   };
 
@@ -578,7 +580,7 @@ function Step3({
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
         <button className="btn btn-secondary" onClick={onBack} disabled={started && !done}>← Terug</button>
         {done && (
-          <button className="btn btn-primary" onClick={() => onDone(results)}>
+          <button className="btn btn-primary" onClick={() => onDone(finalResultsRef.current)}>
             Resultaten bekijken →
           </button>
         )}
