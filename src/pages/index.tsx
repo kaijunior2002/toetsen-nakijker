@@ -624,26 +624,24 @@ function Step4({
   };
 
   const exportCSV = () => {
-    const rows: string[][] = [
-      ['Leerling', 'Totaal', 'Max', 'Twijfel', 'Kan niet beoordelen',
-       ...questions.map(q => `Vraag ${q.question_number} (${q.max_points}pt)`)],
+    // Header: Naam, Totaal, dan per vraag één kolom
+    const header = [
+      'Naam',
+      'Totaal punten',
+      ...questions.map(q => `Vraag ${q.question_number} (max ${q.max_points}pt)`),
     ];
+    const rows: string[][] = [header];
     for (const result of editedResults) {
-      const twijfel = result.grades.filter(g => g.confidence === 'twijfel').length;
-      const kanNiet = result.grades.filter(g => g.confidence === 'kan_niet_beoordelen').length;
       rows.push([
         result.studentName,
         String(result.totalPoints),
-        String(result.maxPoints),
-        String(twijfel),
-        String(kanNiet),
         ...questions.map(q => {
           const grade = result.grades.find(g => g.question_number === q.question_number);
           return grade ? String(grade.points_awarded) : '-';
         }),
       ]);
     }
-    const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const csv = '\uFEFF' + rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
